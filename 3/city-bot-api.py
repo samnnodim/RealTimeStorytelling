@@ -4,13 +4,13 @@ import collections
 import json
 import numpy as np
 
-app = flsk ask.Flask(__name__)
+app = flask.Flask(__name__)
 conn = redis.Redis()
 
 def buildHistogram():
-    keys = conn.keys()
-    values = conn.mget(keys)
-    c = collections.Counter(values)
+    keys = conn.keys()       # gets keys [timestamps] from redis
+    values = conn.mget(keys) # gets the values for each time stamp
+    c = collections.Counter(values) # builds a histogram
     z = sum(c.values())
     return {k:v/float(z) for k,v in c.items()}
 
@@ -22,7 +22,7 @@ def histogram():
 @app.route("/entropy")
 def entropy():
     h = buildHistogram()
-    return -sum([p*np.log(p) for p in h.values()]) 
+    return -sum([p*np.log(p) for p in h.values()])
 
 @app.route("/probability")
 def probability():
@@ -31,7 +31,7 @@ def probability():
     d = conn.hget(city,ref)
     return d
 
-    
+
 
 
 
